@@ -8,6 +8,6 @@ public class AuthException extends RuntimeException {
 
     public AuthException(int code, String message) {
         super(message);
-        this.code = code
+        this.code = code;
     }
 }
