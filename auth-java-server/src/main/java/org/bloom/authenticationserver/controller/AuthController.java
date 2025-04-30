@@ -9,7 +9,6 @@ import org.bloom.authenticationserver.dto.requests.SignupRequest;
 import org.bloom.authenticationserver.dto.responses.LoginResponse;
 import org.bloom.authenticationserver.dto.responses.LogoutResponse;
 import org.bloom.authenticationserver.dto.responses.SignupResponse;
-import org.bloom.authenticationserver.exception.AuthException;
 import org.bloom.authenticationserver.service.UserService;
 import org.bloom.authorizationserver.dto.requests.TokenRequest;
 import org.bloom.authorizationserver.dto.responses.TokenResponse;
@@ -26,48 +25,35 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final PasswordEncoder passwordEncoder;
-
     private final RestTemplateBuilder restTemplateBuilder;
-
+    private final PasswordEncoder passwordEncoder;
     private final UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        try {
-            User user = userService.getUserByUsername(request.getUsername());
 
-            if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                throw new AuthException("Invalid username or password");
-            }
+        User user = userService.getUserByUsername(request.getUsername());
+        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword()))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponse());
 
-            // calls authorization server for access/refresh tokens
-            TokenRequest tokenRequest = TokenRequest.builder()
-                    .username(request.getUsername())
-                    .build();
+        TokenRequest tokenRequest = TokenRequest.builder()
+                .username(request.getUsername())
+                .build();
 
-            ResponseEntity<TokenResponse> responseEntity = restTemplateBuilder.build().postForEntity(
-                    "http://authorization-server:8081/token",
-                    tokenRequest,
-                    TokenResponse.class
-            );
+        ResponseEntity<TokenResponse> responseEntity = restTemplateBuilder.build().postForEntity(
+                "http://authorization-server:8081/token",
+                tokenRequest,
+                TokenResponse.class
+        );
 
-            if (!responseEntity.hasBody())
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); //todo: handle better
+        if (!responseEntity.hasBody())
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new LoginResponse());
 
-            TokenResponse tokenResponse = responseEntity.getBody();
-            return ResponseEntity.ok(LoginResponse.builder()
-                    .accessToken(tokenResponse.getAccessToken())
-                    .refreshToken(tokenResponse.getRefreshToken())
-                    .build());
-
-        } catch (Exception e) { //todo: handle better
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(LoginResponse.builder()
-                            .accessToken(null)
-                            .refreshToken(null)
-                            .build());
-        }
+        TokenResponse tokenResponse = responseEntity.getBody();
+        return ResponseEntity.ok(LoginResponse.builder()
+                .accessToken(tokenResponse.getAccessToken())
+                .refreshToken(tokenResponse.getRefreshToken())
+                .build());
     }
 
     @PostMapping("/logout")
@@ -81,15 +67,11 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<SignupResponse> signup(@Valid @RequestBody SignupRequest request) {
-        if (request.getUsername() == null || request.getPassword() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new SignupResponse());
-        }
-
         String hashedPassword = passwordEncoder.encode(request.getPassword());
 
         User user = userService.saveUser(request.getUsername(), hashedPassword);
-        if (user == null) return null; // todo: actually handle null case
+        if (user == null)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new SignupResponse());
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new SignupResponse());
