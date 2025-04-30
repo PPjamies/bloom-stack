@@ -1,8 +1,8 @@
 package org.bloom.authorizationserver.service;
 
 import io.jsonwebtoken.*;
+import lombok.RequiredArgsConstructor;
 import org.bloom.authorizationserver.exception.TokenValidationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.KeyPair;
@@ -10,12 +10,12 @@ import java.time.Instant;
 import java.util.Date;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService {
     private static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 7;
     private static final long ACCESS_TOKEN_EXPIRATION_TIME = 1000L * 60 * 15;
 
-    @Autowired
-    private KeyPair keyPair;
+    private final KeyPair keyPair;
 
     public String generateAccessToken(String subject) {
         return generateToken(subject, ACCESS_TOKEN_EXPIRATION_TIME);
@@ -36,7 +36,16 @@ public class JwtService {
                 .compact();
     }
 
-    public Claims validateToken(String token) {
+    public boolean isValidToken(String token) {
+        try {
+            validateToken(token);
+            return true;
+        } catch (Exception e) {
+            return false; //todo: ew
+        }
+    }
+
+    private Claims validateToken(String token) {
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(keyPair.getPublic())
@@ -48,5 +57,13 @@ public class JwtService {
         } catch (JwtException e) {
             throw new TokenValidationException("Invalid token");
         }
+    }
+
+    public String getUsernameFromToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(keyPair.getPublic())
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 }
