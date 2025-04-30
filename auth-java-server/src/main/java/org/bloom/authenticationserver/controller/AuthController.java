@@ -1,12 +1,15 @@
 package org.bloom.authenticationserver.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bloom.authenticationserver.dto.User;
 import org.bloom.authenticationserver.dto.requests.LoginRequest;
+import org.bloom.authenticationserver.dto.requests.LogoutRequest;
 import org.bloom.authenticationserver.dto.requests.SignupRequest;
 import org.bloom.authenticationserver.dto.responses.LoginResponse;
+import org.bloom.authenticationserver.dto.responses.LogoutResponse;
 import org.bloom.authenticationserver.dto.responses.SignupResponse;
-import org.bloom.authenticationserver.exception.AuthenticationException;
+import org.bloom.authenticationserver.exception.AuthException;
 import org.bloom.authenticationserver.service.UserService;
 import org.bloom.authorizationserver.dto.requests.TokenRequest;
 import org.bloom.authorizationserver.dto.responses.TokenResponse;
@@ -16,11 +19,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class AuthenticationController {
+public class AuthController {
 
     private final PasswordEncoder passwordEncoder;
 
@@ -29,12 +33,12 @@ public class AuthenticationController {
     private final UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         try {
             User user = userService.getUserByUsername(request.getUsername());
 
             if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                throw new AuthenticationException("Invalid username or password");
+                throw new AuthException("Invalid username or password");
             }
 
             // calls authorization server for access/refresh tokens
@@ -66,8 +70,17 @@ public class AuthenticationController {
         }
     }
 
+    @PostMapping("/logout")
+    ResponseEntity<LogoutResponse> logout(@RequestHeader("Authorization") String authorizationHeader, @Valid @RequestBody LogoutRequest request) {
+        String accessToken = authorizationHeader.substring(7);
+        String refreshToken = request.getRefreshToken();
+
+        // todo: call authorization server to invalidateTokens(accessToken, refreshToken)
+        return ResponseEntity.ok(new LogoutResponse());
+    }
+
     @PostMapping("/signup")
-    public ResponseEntity<SignupResponse> signup(@RequestBody SignupRequest request) {
+    public ResponseEntity<SignupResponse> signup(@Valid @RequestBody SignupRequest request) {
         if (request.getUsername() == null || request.getPassword() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new SignupResponse());

@@ -2,7 +2,7 @@ package org.bloom.authenticationserver.service;
 
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
-import org.bloom.authenticationserver.converter.AuthenticationConverter;
+import org.bloom.authenticationserver.converter.AuthConverter;
 import org.bloom.authenticationserver.dto.User;
 import org.bloom.authenticationserver.repository.UserRepository;
 import org.bloom.authenticationserver.repository.jpa.DBUser;
@@ -20,7 +20,7 @@ public class UserService {
                     .username(username)
                     .password(password)
                     .build());
-            return AuthenticationConverter.convert(dbUser);
+            return AuthConverter.convert(dbUser);
         } catch (Exception e) {
             return null; //todo: handle exception
         }
@@ -31,7 +31,7 @@ public class UserService {
             return null;
 
         try {
-            return AuthenticationConverter.convert(userRepository.findByUsername(username));
+            return AuthConverter.convert(userRepository.findByUsername(username));
         } catch (Exception e) {
             return null; //todo: handle exception
         }

@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>org.bloom</groupId>
-    <artifactId>authentication-server</artifactId>
+    <artifactId>auth-java-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <properties>
         <java.version>21</java.version>
@@ -36,6 +36,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
