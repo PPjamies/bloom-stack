@@ -1,7 +1,13 @@
 package org.bloom.authenticationserver.exception;
 
+import lombok.Getter;
+
+@Getter
 public class AuthException extends RuntimeException {
-    public AuthException(String message) {
+    private final int code;
+
+    public AuthException(int code, String message) {
         super(message);
+        this.code = code
     }
 }
