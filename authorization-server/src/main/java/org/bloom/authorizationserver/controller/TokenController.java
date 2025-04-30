@@ -1,5 +1,6 @@
 package org.bloom.authorizationserver.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bloom.authorizationserver.dto.requests.TokenRequest;
 import org.bloom.authorizationserver.dto.responses.TokenResponse;
@@ -9,14 +10,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequiredArgsConstructor
 @RestController
+@RequiredArgsConstructor
 public class TokenController {
 
     private JwtService jwtService;
 
     @PostMapping("/token")
-    public ResponseEntity<TokenResponse> generateTokens(@RequestBody TokenRequest request) {
+    public ResponseEntity<TokenResponse> generateTokens(@Valid @RequestBody TokenRequest request) {
         return ResponseEntity.ok(TokenResponse.builder()
                 .accessToken(jwtService.generateAccessToken(request.getUsername()))
                 .refreshToken(jwtService.generateRefreshToken(request.getUsername()))

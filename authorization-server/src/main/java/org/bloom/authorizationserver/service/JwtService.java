@@ -2,7 +2,8 @@ package org.bloom.authorizationserver.service;
 
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
-import org.bloom.authorizationserver.exception.TokenValidationException;
+import org.bloom.authorizationserver.constant.AuthorizationConstants;
+import org.bloom.authorizationserver.exception.AuthorizationException;
 import org.springframework.stereotype.Service;
 
 import java.security.KeyPair;
@@ -53,9 +54,9 @@ public class JwtService {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
-            throw new TokenValidationException("Token expired");
+            throw new AuthorizationException(AuthorizationConstants.TOKEN_EXPIRED, "Token expired: " + token);
         } catch (JwtException e) {
-            throw new TokenValidationException("Invalid token");
+            throw new AuthorizationException(AuthorizationConstants.TOKEN_INVALID, "Invalid token: " + token);
         }
     }
 
