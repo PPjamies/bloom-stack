@@ -5,7 +5,11 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.bloom.authorizationserver.service.JwtService;
+import lombok.RequiredArgsConstructor;
+import org.bloom.authenticationserver.constant.AuthError;
+import org.bloom.authenticationserver.dto.User;
+import org.bloom.authenticationserver.exception.AuthException;
+import org.bloom.authenticationserver.service.JwtService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -15,13 +19,10 @@ import java.io.IOException;
 import java.util.Collections;
 
 @Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+@RequiredArgsConstructor
+public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-
-    public JwtAuthenticationFilter(JwtService jwtService) {
-        this.jwtService = jwtService;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -32,17 +33,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+
         String token = authHeader.substring(7);
-
-        if (!StringUtils.isEmpty(token) && jwtService.isValidToken(token)) {
-            String username = jwtService.getUsernameFromToken(token);
-
-            if (username != null) {
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+        if (StringUtils.isEmpty(token)) {
+            throw new AuthException(AuthError.INVALID_TOKEN, "Token is empty");
         }
+
+        User user = jwtService.extractUser(token); // throws exception if token is invalid
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, Collections.emptyList());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
     }

@@ -1,15 +1,16 @@
 package org.bloom.authenticationserver.repository.jpa;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = DBUser.PASSWORD)
 @Table(name = DBUser.TABLE_NAME)
 public class DBUser {
     public static final String TABLE_NAME = "user";

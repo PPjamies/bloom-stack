@@ -7,19 +7,15 @@ public class AuthConverter {
 
     public static User convert(DBUser from) {
         User to = new User();
-
         to.setUsername(from.getUsername());
         to.setPassword(from.getPassword());
-
         return to;
     }
 
     public static DBUser convert(User from) {
         DBUser to = new DBUser();
-
         to.setUsername(from.getUsername());
         to.setPassword(from.getPassword());
-
         return to;
     }
 }

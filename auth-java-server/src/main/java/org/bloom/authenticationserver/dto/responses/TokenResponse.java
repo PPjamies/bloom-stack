@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class SignupResponse extends Response {
-    private String username;
+public class TokenResponse extends Response {
+    private String accessToken;
+    private String refreshToken;
 }

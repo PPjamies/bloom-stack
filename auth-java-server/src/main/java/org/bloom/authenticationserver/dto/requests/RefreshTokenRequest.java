@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.bloom.authenticationserver.constant.AuthConstants;
 
 @Getter
-public class LogoutRequest extends Request {
+public class RefreshTokenRequest extends Request {
 
     @NotBlank(message = AuthConstants.REQUIRED_REFRESH_TOKEN)
     private String refreshToken;
