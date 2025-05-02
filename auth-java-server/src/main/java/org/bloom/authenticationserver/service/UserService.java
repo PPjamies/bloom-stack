@@ -22,16 +22,6 @@ public class UserService {
         return userRepository.existsByUsername(username);
     }
 
-    private User saveUser(String username, String password) {
-        // hash password before saving into db
-        password = passwordEncoder.encode(password);
-        DBUser dbUser = userRepository.save(DBUser.builder()
-                .username(username)
-                .password(password)
-                .build());
-        return AuthConverter.convert(dbUser);
-    }
-
     public User createUser(String username, String password) {
         if (isExistingUser(username)) {
             throw new AuthException(AuthError.USER_ALREADY_EXISTS, "User " + username + " already exists");
@@ -44,6 +34,14 @@ public class UserService {
             throw new AuthException(AuthError.USER_NOT_FOUND, "User " + username + " not found");
         }
         return saveUser(username, password);
+    }
+
+    private User saveUser(String username, String password) {
+        DBUser dbUser = userRepository.save(DBUser.builder()
+                .username(username)
+                .password(passwordEncoder.encode(password)) // hash password before saving
+                .build());
+        return AuthConverter.convert(dbUser);
     }
 
     public User getUser(String username) {
