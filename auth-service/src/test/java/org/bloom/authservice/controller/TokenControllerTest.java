@@ -2,13 +2,11 @@ package org.bloom.authservice.controller;
 
 import com.google.gson.Gson;
 import org.bloom.authservice.constant.AuthConstants;
-import org.bloom.authservice.dto.User;
-import org.bloom.authservice.dto.requests.LoginRequest;
-import org.bloom.authservice.dto.requests.SignupRequest;
-import org.bloom.authservice.dto.responses.LoginResponse;
-import org.bloom.authservice.dto.responses.SignupResponse;
+import org.bloom.authservice.dto.requests.RefreshTokenRequest;
+import org.bloom.authservice.dto.requests.TokenRequest;
+import org.bloom.authservice.dto.responses.RefreshTokenResponse;
+import org.bloom.authservice.dto.responses.TokenResponse;
 import org.bloom.authservice.service.JwtService;
-import org.bloom.authservice.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthControllerTest {
+public class TokenControllerTest {
 
     private final Gson gson = new Gson();
 
@@ -34,76 +32,63 @@ public class AuthControllerTest {
     @Mock
     private JwtService jwtService;
 
-    @Mock
-    private UserService userService;
-
     @InjectMocks
-    private AuthController authController;
+    private TokenController tokenController;
 
     @BeforeEach
     public void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(tokenController).build();
     }
 
     @Test
-    void loginTest() throws Exception {
+    void generateTokens_success() throws Exception {
         String username = "username";
-        String password = "password";
-        String accessToken = "accessToken";
-        String refreshToken = "refreshToken";
+        String accessToken = "access-token";
+        String refreshToken = "refresh-token";
 
-        LoginResponse response = LoginResponse.builder()
+        TokenResponse response = TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
 
-        when(userService.getUserAndValidatePassword(username, password)).thenReturn(User.builder()
-                .username(username)
-                .password(password)
-                .build());
         when(jwtService.generateToken(username, AuthConstants.ACCESS_TOKEN_EXP_MILLIS)).thenReturn(accessToken);
         when(jwtService.generateToken(username, AuthConstants.REFRESH_TOKEN_EXP_MILLIS)).thenReturn(refreshToken);
 
-        MvcResult result = mockMvc.perform(post("/login")
+        MvcResult result = mockMvc.perform(post("/token")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(gson.toJson(LoginRequest.builder()
+                        .content(gson.toJson(TokenRequest.builder()
                                 .username(username)
-                                .password(password)
                                 .build())))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String responseBody = result.getResponse().getContentAsString();
-        LoginResponse actualResponse = gson.fromJson(responseBody, LoginResponse.class);
+        TokenResponse actualResponse = gson.fromJson(responseBody, TokenResponse.class);
         assert (response.getAccessToken().equals(actualResponse.getAccessToken()));
         assert (response.getRefreshToken().equals(actualResponse.getRefreshToken()));
     }
 
     @Test
-    void signupTest() throws Exception {
-        String username = "username";
-        String password = "password";
+    void refreshTokens_success() throws Exception {
+        String refreshToken = "refresh-token";
+        String newAccessToken = "new-access-token";
 
-        SignupResponse response = SignupResponse.builder()
-                .username(username)
+        RefreshTokenResponse response = RefreshTokenResponse.builder()
+                .accessToken(newAccessToken)
                 .build();
 
-        when(userService.createUser(username, password)).thenReturn(User.builder()
-                .username(username)
-                .password(password)
-                .build());
+        when(jwtService.refreshToken(refreshToken)).thenReturn(newAccessToken);
 
-        MvcResult result = mockMvc.perform(post("/signup")
+        MvcResult result = mockMvc.perform(post("/refresh-token")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(gson.toJson(SignupRequest.builder()
-                                .username(username)
-                                .password(password)
+                        .content(gson.toJson(RefreshTokenRequest.builder()
+                                .refreshToken(refreshToken)
                                 .build())))
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andReturn();
 
         String responseBody = result.getResponse().getContentAsString();
-        SignupResponse actualResponse = gson.fromJson(responseBody, SignupResponse.class);
-        assert (response.getUsername().equals(actualResponse.getUsername()));
+        RefreshTokenResponse actualResponse = gson.fromJson(responseBody, RefreshTokenResponse.class);
+        assert (response.getAccessToken().equals(actualResponse.getAccessToken()));
     }
 }
