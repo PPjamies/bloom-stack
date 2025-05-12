@@ -1,5 +1,6 @@
 package org.bloom.authservice.config;
 
+import lombok.RequiredArgsConstructor;
 import org.bloom.authservice.filter.JwtAuthFilter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.context.annotation.Bean;
@@ -20,19 +21,16 @@ import java.security.spec.ECGenParameterSpec;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
-        this.jwtAuthFilter = jwtAuthFilter;
-    }
-
     @Bean
     public KeyPair ecKeyPair() throws Exception {
         Security.addProvider(new BouncyCastleProvider());
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC", "BC");
-        keyPairGenerator.initialize(new ECGenParameterSpec("secp256k1")); // P-256
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC");
+        keyPairGenerator.initialize(new ECGenParameterSpec("secp256r1")); // P-256
         return keyPairGenerator.generateKeyPair();
     }
 

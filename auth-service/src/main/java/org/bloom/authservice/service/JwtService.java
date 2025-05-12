@@ -19,7 +19,7 @@ public class JwtService {
     private final KeyPair keyPair;
     private final UserService userService;
 
-    private String generateToken(String subject, long exprMillis) {
+    public String generateToken(String subject, long exprMillis) {
         Instant now = Instant.now();
         return Jwts.builder()
                 .setSubject(subject)
@@ -27,14 +27,6 @@ public class JwtService {
                 .setExpiration(Date.from(now.plusMillis(exprMillis)))
                 .signWith(keyPair.getPrivate(), SignatureAlgorithm.ES256)
                 .compact();
-    }
-
-    public String generateAccessToken(String subject) {
-        return generateToken(subject, AuthConstants.ACCESS_TOKEN_EXP_MILLIS);
-    }
-
-    public String generateRefreshToken(String subject) {
-        return generateToken(subject, AuthConstants.REFRESH_TOKEN_EXP_MILLIS);
     }
 
     public Claims validateAndDecodeToken(String token) {
@@ -61,6 +53,6 @@ public class JwtService {
 
     public String refreshToken(String refreshToken) {
         User user = extractUser(refreshToken);
-        return generateAccessToken(user.getUsername());
+        return generateToken(user.getUsername(), AuthConstants.ACCESS_TOKEN_EXP_MILLIS);
     }
 }

@@ -2,6 +2,7 @@ package org.bloom.authservice.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.bloom.authservice.constant.AuthConstants;
 import org.bloom.authservice.dto.User;
 import org.bloom.authservice.dto.requests.LoginRequest;
 import org.bloom.authservice.dto.requests.SignupRequest;
@@ -26,8 +27,8 @@ public class AuthController {
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         User user = userService.getUserAndValidatePassword(request.getUsername(), request.getPassword());
 
-        String accessToken = jwtService.generateAccessToken(user.getUsername());
-        String refreshToken = jwtService.generateRefreshToken(user.getUsername());
+        String accessToken = jwtService.generateToken(user.getUsername(), AuthConstants.ACCESS_TOKEN_EXP_MILLIS);
+        String refreshToken = jwtService.generateToken(user.getUsername(), AuthConstants.REFRESH_TOKEN_EXP_MILLIS);
 
         return ResponseEntity.ok(LoginResponse.builder()
                 .accessToken(accessToken)

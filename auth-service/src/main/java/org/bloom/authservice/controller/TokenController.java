@@ -2,6 +2,7 @@ package org.bloom.authservice.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.bloom.authservice.constant.AuthConstants;
 import org.bloom.authservice.dto.requests.RefreshTokenRequest;
 import org.bloom.authservice.dto.requests.TokenRequest;
 import org.bloom.authservice.dto.responses.RefreshTokenResponse;
@@ -21,8 +22,8 @@ public class TokenController {
     @PostMapping("/token")
     public ResponseEntity<TokenResponse> generateTokens(@Valid @RequestBody TokenRequest request) {
         return ResponseEntity.ok(TokenResponse.builder()
-                .accessToken(jwtService.generateAccessToken(request.getUsername()))
-                .refreshToken(jwtService.generateRefreshToken(request.getUsername()))
+                .accessToken(jwtService.generateToken(request.getUsername(), AuthConstants.ACCESS_TOKEN_EXP_MILLIS))
+                .refreshToken(jwtService.generateToken(request.getUsername(), AuthConstants.REFRESH_TOKEN_EXP_MILLIS))
                 .build());
     }
 
