@@ -8,7 +8,7 @@ import org.bloom.authservice.dto.requests.LoginRequest;
 import org.bloom.authservice.dto.requests.SignupRequest;
 import org.bloom.authservice.dto.responses.LoginResponse;
 import org.bloom.authservice.dto.responses.SignupResponse;
-import org.bloom.authservice.service.JwtService;
+import org.bloom.authservice.service.JWTService;
 import org.bloom.authservice.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final JwtService jwtService;
+    private final JWTService jwtService;
     private final UserService userService;
 
     @PostMapping("/login")

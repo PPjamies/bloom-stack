@@ -16,16 +16,15 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final JWTService jwtService;
 
-    public boolean isExistingUser(String username) {
-        return userRepository.existsByUsername(username);
-    }
-
-    public User createUser(String username, String password) {
-        if (isExistingUser(username)) {
+    private void checkUserExistence(String username, boolean shouldExist) {
+        boolean userExists = userRepository.existsByUsername(username);
+        if (shouldExist && !userExists) {
+            throw new AuthException(AuthError.USER_NOT_FOUND, "User not found: " + username);
+        } else if (!shouldExist && userExists) {
             throw new AuthException(AuthError.USER_ALREADY_EXISTS, "User " + username + " already exists");
         }
-        return saveUser(username, password);
     }
 
     private User saveUser(String username, String password) {
@@ -36,10 +35,13 @@ public class UserService {
         return AuthConverter.convert(dbUser);
     }
 
+    public User createUser(String username, String password) {
+        checkUserExistence(username, false);
+        return saveUser(username, password);
+    }
+
     public User getUser(String username) {
-        if (!isExistingUser(username)) {
-            throw new AuthException(AuthError.USER_NOT_FOUND, "User " + username + " not found");
-        }
+        checkUserExistence(username, true);
         DBUser dbUser = userRepository.findByUsername(username);
         return AuthConverter.convert(dbUser);
     }
@@ -50,6 +52,12 @@ public class UserService {
             throw new AuthException(AuthError.PASSWORD_MISMATCH, "Password does not match");
         }
         return user;
+    }
+
+    public User getUserFromToken(String token) {
+        String username = jwtService.extractSubject(token);
+        checkUserExistence(username, true);
+        return getUser(username);
     }
 }
 

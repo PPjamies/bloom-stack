@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.bloom.authservice.constant.AuthError;
 import org.bloom.authservice.dto.User;
 import org.bloom.authservice.exception.AuthException;
-import org.bloom.authservice.service.JWTService;
+import org.bloom.authservice.service.UserService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     private final String AUTHORIZATION_HEADER = "Authorization";
     private final String BEARER_TOKEN = "Bearer ";
 
-    private final JWTService jwtService;
+    private final UserService userService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -48,7 +48,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
         User user;
         try {
-            user = jwtService.extractUserFromToken(token);
+            user = userService.getUserFromToken(token);
         } catch (AuthException e) {
             throw new AuthException(AuthError.AUTHENTICATION_FAILED, "Authentication failed");
         }
