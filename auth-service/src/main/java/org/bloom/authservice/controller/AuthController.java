@@ -26,13 +26,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         User user = userService.getUserAndValidatePassword(request.getUsername(), request.getPassword());
-
-        String accessToken = jwtService.generateToken(user.getUsername(), AuthConstants.ACCESS_TOKEN_EXP_MILLIS);
-        String refreshToken = jwtService.generateToken(user.getUsername(), AuthConstants.REFRESH_TOKEN_EXP_MILLIS);
-
         return ResponseEntity.ok(LoginResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                .accessToken(jwtService.generateToken(user.getUsername(), AuthConstants.ACCESS_TOKEN_EXP_MILLIS))
+                .refreshToken(jwtService.generateToken(user.getUsername(), AuthConstants.REFRESH_TOKEN_EXP_MILLIS))
                 .build());
     }
 
