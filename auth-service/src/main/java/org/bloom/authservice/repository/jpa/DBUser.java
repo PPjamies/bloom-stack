@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = DBUser.TABLE_NAME)
 public class DBUser {
-    public static final String TABLE_NAME = "user";
+    public static final String TABLE_NAME = "users";
     public static final String ID = "id";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
@@ -21,7 +21,7 @@ public class DBUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = ID)
-    private long id;
+    private Long id;
 
     @Column(name = USERNAME, nullable = false, unique = true)
     private String username;
