@@ -7,7 +7,7 @@ import org.bloom.authservice.dto.requests.LoginRequest;
 import org.bloom.authservice.dto.requests.SignupRequest;
 import org.bloom.authservice.dto.responses.LoginResponse;
 import org.bloom.authservice.dto.responses.SignupResponse;
-import org.bloom.authservice.service.JwtService;
+import org.bloom.authservice.service.JWTService;
 import org.bloom.authservice.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ public class AuthControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private JwtService jwtService;
+    private JWTService jwtService;
 
     @Mock
     private UserService userService;
