@@ -48,7 +48,7 @@ public class UserService {
 
     public User getUserAndValidatePassword(String username, String password) {
         User user = getUser(username);
-        if (!passwordEncoder.matches(user.getPassword(), password)) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new AuthException(AuthError.PASSWORD_MISMATCH, "Password does not match");
         }
         return user;
