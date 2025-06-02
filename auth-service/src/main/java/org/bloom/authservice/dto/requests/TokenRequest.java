@@ -9,6 +9,6 @@ import org.bloom.authservice.constant.AuthConstants;
 @Builder
 public class TokenRequest extends Request {
 
-    @NotBlank(message = AuthConstants.REQUIRED_USERNAME)
+    @NotBlank(message = AuthConstants.USERNAME_REQUIRED)
     private String username;
 }

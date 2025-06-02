@@ -9,9 +9,9 @@ import org.bloom.authservice.constant.AuthConstants;
 @Builder
 public class SignupRequest extends Request {
 
-    @NotBlank(message = AuthConstants.REQUIRED_USERNAME)
+    @NotBlank(message = AuthConstants.USERNAME_REQUIRED)
     private String username;
 
-    @NotBlank(message = AuthConstants.REQUIRED_PASSWORD)
+    @NotBlank(message = AuthConstants.PASSWORD_REQUIRED)
     private String password;
 }

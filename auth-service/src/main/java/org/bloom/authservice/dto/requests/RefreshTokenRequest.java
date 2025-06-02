@@ -9,6 +9,6 @@ import org.bloom.authservice.constant.AuthConstants;
 @Builder
 public class RefreshTokenRequest extends Request {
 
-    @NotBlank(message = AuthConstants.REQUIRED_REFRESH_TOKEN)
+    @NotBlank(message = AuthConstants.REFRESH_TOKEN_REQUIRED)
     private String refreshToken;
 }
