@@ -20,8 +20,8 @@ public class DBClient {
 
     // spring oauth2 details
     public static final String REGISTERED_CLIENT_ID = "registeredClientId";
+    public static final String NAME = "name";
     public static final String CLIENT_ID = "client_id";
-    public static final String CLIENT_NAME = "client_name";
     public static final String CLIENT_AUTHENTICATION_METHODS = "client_authentication_methods";
     public static final String AUTHORIZATION_GRANT_TYPES = "authorization_grant_types";
     public static final String SCOPES = "scopes";
@@ -45,11 +45,11 @@ public class DBClient {
     @Column(name = REGISTERED_CLIENT_ID, nullable = false, unique = true)
     private String registeredClientId;
 
+    @Column(name = NAME, nullable = false)
+    private String name;
+
     @Column(name = CLIENT_ID, nullable = false, unique = true)
     private String clientId;
-
-    @Column(name = CLIENT_NAME, nullable = false)
-    private String clientName;
 
     @Column(name = CLIENT_AUTHENTICATION_METHODS, columnDefinition = "TEXT", nullable = false)
     private String clientAuthenticationMethods;
