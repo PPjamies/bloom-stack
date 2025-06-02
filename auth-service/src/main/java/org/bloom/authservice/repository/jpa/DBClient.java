@@ -19,6 +19,7 @@ public class DBClient {
     public static final String ID = "id";
 
     // spring oauth2 details
+    public static final String REGISTERED_CLIENT_ID = "registeredClientId";
     public static final String CLIENT_ID = "client_id";
     public static final String CLIENT_NAME = "client_name";
     public static final String CLIENT_AUTHENTICATION_METHODS = "client_authentication_methods";
@@ -40,6 +41,9 @@ public class DBClient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = ID)
     private Long id;
+
+    @Column(name = REGISTERED_CLIENT_ID, nullable = false, unique = true)
+    private String registeredClientId;
 
     @Column(name = CLIENT_ID, nullable = false, unique = true)
     private String clientId;

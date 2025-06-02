@@ -9,6 +9,9 @@ import org.bloom.authservice.constant.AuthConstants;
 @Builder
 public class RegisterClientRequest extends Request {
 
+    @NotBlank(message = AuthConstants.CLIENT_NAME_REQUIRED)
+    private String name;
+
     @NotBlank(message = AuthConstants.CLIENT_ID_REQUIRED)
     private String clientId;
 
