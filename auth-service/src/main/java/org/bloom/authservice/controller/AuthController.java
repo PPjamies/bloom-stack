@@ -53,4 +53,10 @@ public class AuthController {
                 .username(appUser.getUsername())
                 .build());
     }
+
+    // todo: /logout (cache blacklist)
+
+    // todo: /change-password
+
+    // todo: /recovery (password/username recovery)
 }
