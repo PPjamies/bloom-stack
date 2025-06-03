@@ -1,4 +1,4 @@
-spring.application.name=authentication-server
+spring.application.name=auth-server
 server.port=8090
 
 # jwt token
