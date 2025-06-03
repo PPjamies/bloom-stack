@@ -11,10 +11,4 @@ public class RegisterClientRequest extends Request {
 
     @NotBlank(message = AuthConstants.CLIENT_NAME_REQUIRED)
     private String name;
-
-    @NotBlank(message = AuthConstants.CLIENT_ID_REQUIRED)
-    private String clientId;
-
-    @NotBlank(message = AuthConstants.CLIENT_SECRET_REQUIRED)
-    private String clientSecret;
 }

@@ -9,9 +9,11 @@ import org.bloom.authservice.service.ClientService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/client")
 @RequiredArgsConstructor
 public class ClientController {
 
@@ -19,7 +21,7 @@ public class ClientController {
 
     @PostMapping("/register-client")
     public ResponseEntity<RegisterClientResponse> register(@Valid @RequestBody RegisterClientRequest request) {
-        Client client = clientService.registerClient(request.getName(), request.getClientId(), request.getClientSecret());
+        Client client = clientService.registerClient(request.getName());
         return ResponseEntity.ok(RegisterClientResponse.builder()
                 .client(client)
                 .build());

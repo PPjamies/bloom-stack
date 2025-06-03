@@ -16,6 +16,8 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -31,18 +33,20 @@ public class ClientService {
     private final PasswordEncoder passwordEncoder;
     private final RegisteredClientRepository registeredClientRepository;
     private final ClientRepository clientRepository;
+    private final SecureRandom secureRandom = new SecureRandom();
 
-    public Client registerClient(@NotBlank String name, @NotBlank String clientId, @NotBlank String clientSecret) {
+    public Client registerClient(@NotBlank String name) {
 
         String registeredClientId = UUID.randomUUID().toString();
-        String encodedClientSecret = passwordEncoder.encode(clientSecret);
+        String clientId = UUID.randomUUID().toString();
+        String clientSecret = new BigInteger(256, secureRandom).toString(32);
 
         // create spring oauth2 registered client
         RegisteredClient registeredClient = RegisteredClient
                 .withId(registeredClientId)
                 .clientName(name)
                 .clientId(clientId)
-                .clientSecret(encodedClientSecret)
+                .clientSecret(passwordEncoder.encode(clientSecret))
                 .clientSecretExpiresAt(Instant.now().plusMillis(AuthConstants.CLIENT_SECRET_EXP_MILLIS))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
@@ -64,7 +68,7 @@ public class ClientService {
         return Client.builder()
                 .name(name)
                 .clientId(clientId)
-                .clientSecret(encodedClientSecret)
+                .clientSecret(clientSecret)
                 .tokenEndpoint(tokenEndpoint)
                 .scopes(List.of("read", "write"))
                 .build();
